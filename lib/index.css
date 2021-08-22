@@ -1,0 +1,78 @@
+.markdown-navigation {
+  width: 100%;
+  width: 200px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Helvetica",
+    "Arial", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "WenQuanYi Micro Hei", sans-serif;
+  scrollbar-width: 0;
+}
+.markdown-navigation::-webkit-scrollbar {
+  width: 0;
+}
+
+.markdown-navigation .title-anchor {
+  display: block;
+  margin: 0.8em 0;
+  padding-right: 1.8em;
+  color: #bbb;
+  font-weight: lighter;
+  line-height: 2em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.markdown-navigation .title-anchor:hover,
+.markdown-navigation .title-anchor.active {
+  text-decoration: inherit;
+  background-color: #f8f8f8;
+}
+
+.markdown-navigation .title-anchor.active {
+  color: #007fff;
+}
+
+.markdown-navigation .title-anchor small {
+  margin: 0 0.8em;
+}
+
+.markdown-navigation .title-level1 {
+  padding-left: 1em;
+  color: #000;
+  font-weight: normal;
+  font-size: 1.2em;
+}
+
+.markdown-navigation .title-level2 {
+  padding-left: 1em;
+  color: #333;
+  font-weight: normal;
+  font-size: 1em;
+}
+
+.markdown-navigation .title-level3 {
+  padding-left: 3em;
+  color: #666;
+  font-weight: normal;
+  font-size: 0.8em;
+}
+
+.markdown-navigation .title-level4 {
+  padding-left: 5em;
+  color: #999;
+  font-size: 0.72em;
+}
+
+.markdown-navigation .title-level5 {
+  padding-left: 7em;
+  color: #aaa;
+  font-size: 0.72em;
+}
+
+.markdown-navigation .title-level6 {
+  padding-left: 9em;
+  color: #bbb;
+  font-size: 0.72em;
+}
