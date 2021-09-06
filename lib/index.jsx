@@ -1,47 +1,42 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-
+import styles from "./index.module.css";
 
 function throttle(fn, wait) {
-    let callback = fn;    
-    let timerId = null;
+  let callback = fn;
+  let timerId = null;
 
-    // 是否是第一次执行
-    let firstInvoke = true;
+  // 是否是第一次执行
+  let firstInvoke = true;
 
-    function throttled() {
-        let context = this;
-        let args = arguments;           
+  function throttled() {
+    let context = this;
+    let args = arguments;
 
-        // 如果是第一次触发，直接执行
-        if (firstInvoke) {
-            callback.apply(context, args);
-            firstInvoke = false;
-            return ;
-        }
-
-        // 如果定时器已存在，直接返回。        
-        if (timerId) {
-            return ;
-        }
-
-        timerId = setTimeout(function() {  
-            // 注意这里 将 clearTimeout 放到 内部来执行了
-            clearTimeout(timerId);
-            timerId = null;
-
-            callback.apply(context, args);
-        }, wait);
+    // 如果是第一次触发，直接执行
+    if (firstInvoke) {
+      callback.apply(context, args);
+      firstInvoke = false;
+      return;
     }
 
-    // 返回一个闭包
-    return throttled;
-}
+    // 如果定时器已存在，直接返回。
+    if (timerId) {
+      return;
+    }
 
-作者：jkCaptain
-链接：https://juejin.cn/post/6844903760334946312
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+    timerId = setTimeout(function () {
+      // 注意这里 将 clearTimeout 放到 内部来执行了
+      clearTimeout(timerId);
+      timerId = null;
+
+      callback.apply(context, args);
+    }, wait);
+  }
+
+  // 返回一个闭包
+  return throttled;
+}
 
 export class MarkdownNavbar extends Component {
   static propTypes = {
@@ -49,8 +44,15 @@ export class MarkdownNavbar extends Component {
     ordered: PropTypes.bool,
     headingTopOffset: PropTypes.number,
     updateHashAuto: PropTypes.bool,
+    hashMode: PropTypes.bool.isRequired,
     declarative: PropTypes.bool,
     className: PropTypes.string,
+    container: PropTypes.node,
+    scrollConfig: PropTypes.shape({
+      top: PropTypes.number,
+      left: PropTypes.number,
+      behavior: PropTypes.string,
+    }),
     onNavItemClick: PropTypes.func,
     onHashChange: PropTypes.func,
   };
@@ -59,10 +61,16 @@ export class MarkdownNavbar extends Component {
     source: "",
     ordered: true,
     headingTopOffset: 0,
-    updateHashAuto: true,
+    updateHashAuto: false,
+    hashMode: false,
     declarative: false,
     className: "",
     container: window,
+    scrollConfig: {
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    },
     onNavItemClick: () => {},
     onHashChange: () => {},
   };
@@ -73,39 +81,6 @@ export class MarkdownNavbar extends Component {
       currentListNo: "",
       navStructure: [],
     };
-  }
-
-  safeScrollTo(element, top, left = 0, smooth = true) {
-    // element only supports dom of ref instance(ref.current or callback ref)
-
-    const scrollConfig = {
-      top,
-      left,
-    };
-    if (smooth) {
-      scrollConfig.behavior = "smooth";
-    }
-
-    element.scrollTo(scrollConfig);
-  }
-
-  refreshNav(source) {
-    if (this.addTargetTimeout) {
-      clearTimeout(this.addTargetTimeout);
-    }
-    this.setState({ navStructure: this.getNavStructure(source) }, () => {
-      this.addTargetTimeout = setTimeout(() => {
-        this.initHeadingsId();
-        if (this.state.navStructure.length) {
-          const { listNo } = this.state.navStructure[0];
-          this.setState({
-            currentListNo: listNo,
-          });
-        }
-        document.addEventListener("scroll", this.winScroll, true);
-        // window.addEventListener('hashchange', this.winHashChange, false);
-      }, 500);
-    });
   }
 
   componentDidMount() {
@@ -128,7 +103,7 @@ export class MarkdownNavbar extends Component {
       }
       this.scrollEventLock = true;
 
-      this.safeScrollTo(this.props.container, 0, 0);
+      this.safeScrollTo(this.props.container, 0);
       this.setState({
         currentListNo: "",
       });
@@ -153,7 +128,7 @@ export class MarkdownNavbar extends Component {
       clearTimeout(this.scrollTimeout);
     }
     document.removeEventListener("scroll", this.winScroll, true);
-    // window.removeEventListener('hashchange', this.winHashChange, false);
+    window.removeEventListener("hashchange", this.winHashChange, false);
   }
 
   trimArrZero(arr) {
@@ -235,6 +210,33 @@ export class MarkdownNavbar extends Component {
     return navData;
   }
 
+  safeScrollTo(element, top, left = 0) {
+    // element only supports dom of ref instance(ref.current or callback ref)
+
+    const { scrollConfig } = this.props;
+
+    element.scrollTo({ top, left, ...scrollConfig });
+  }
+
+  refreshNav(source) {
+    if (this.addTargetTimeout) {
+      clearTimeout(this.addTargetTimeout);
+    }
+    this.setState({ navStructure: this.getNavStructure(source) }, () => {
+      this.addTargetTimeout = setTimeout(() => {
+        this.initHeadingsId();
+        if (this.state.navStructure.length) {
+          const { listNo } = this.state.navStructure[0];
+          this.setState({
+            currentListNo: listNo,
+          });
+        }
+        document.addEventListener("scroll", this.winScroll, true);
+        window.addEventListener("hashchange", this.winHashChange, false);
+      }, 500);
+    });
+  }
+
   scrollToTarget(dataId) {
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout);
@@ -245,8 +247,7 @@ export class MarkdownNavbar extends Component {
       if (target && typeof target.offsetTop === "number") {
         this.safeScrollTo(
           this.props.container,
-          target.offsetTop - this.props.headingTopOffset,
-          0
+          target.offsetTop - this.props.headingTopOffset
         );
       }
     }, 0);
@@ -286,7 +287,7 @@ export class MarkdownNavbar extends Component {
 
   getHeadingList() {
     const headingList = [];
-    const {navStructure} = this.state;
+    const { navStructure } = this.state;
 
     navStructure.forEach((t) => {
       const headings = document.querySelectorAll(`h${t.level}`);
@@ -315,35 +316,25 @@ export class MarkdownNavbar extends Component {
   winScroll = throttle(() => {
     if (this.scrollEventLock) return;
 
-    const scrollTop =
-      window.pageYOffset ||
-      document.documentElement.scrollTop ||
-      document.body.scrollTop ||
-      this.props.container.scrollTop ||
-      0;
-
     const newHeadingList = this.getHeadingList().map((h) => ({
       ...h,
-      distanceToTop: Math.abs(
-        scrollTop + this.props.headingTopOffset - h.offsetTop
-      ),
+      distanceToTop: Math.abs(this.props.headingTopOffset - h.offsetTop),
     }));
-    const distanceList = newHeadingList.map((h) => h.distanceToTop);
-    const minDistance = Math.min(...distanceList);
+    const minDistance = Math.min(...newHeadingList.map((h) => h.distanceToTop));
     const curHeading = newHeadingList.find(
       (h) => h.distanceToTop === minDistance
     );
 
     if (!curHeading) return;
 
-    // if (this.props.updateHashAuto) {
-    //   // Hash changing callback
-    //   if (curHeading.dataId !== this.getCurrentHashValue()) {
-    //     this.props.onHashChange(curHeading.dataId, this.getCurrentHashValue());
-    //   }
+    if (this.props.updateHashAuto && this.props.hashMode) {
+      // Hash changing callback
+      if (curHeading.dataId !== this.getCurrentHashValue()) {
+        this.props.onHashChange(curHeading.dataId, this.getCurrentHashValue());
+      }
 
-    //   this.updateHash(curHeading.dataId);
-    // }
+      this.updateHash(curHeading.dataId);
+    }
     this.setState({
       currentListNo: curHeading.listNo,
     });
@@ -353,46 +344,49 @@ export class MarkdownNavbar extends Component {
     this.scrollToTarget(this.state.currentListNo);
   };
 
-  // updateHash(value) {
-  //   if (this.updateHashTimeout) {
-  //     clearTimeout(this.updateHashTimeout);
-  //   }
+  updateHash(value) {
+    if (this.updateHashTimeout) {
+      clearTimeout(this.updateHashTimeout);
+    }
 
-  //   this.updateHashTimeout = setTimeout(() => {
-  //     window.history.replaceState(
-  //       {},
-  //       '',
-  //       `${window.location.pathname}${window.location.search}#${value}`,
-  //     );
-  //   }, 0);
-  // }
+    this.updateHashTimeout = setTimeout(() => {
+      window.history.replaceState(
+        {},
+        "",
+        `${window.location.pathname}${window.location.search}#${value}`
+      );
+    }, 0);
+  }
 
   render() {
-    const {ordered,onHashChange,onNavItemClick,className} = this.props;
-    const {currentListNo,navStructure} = this.state;
+    const { ordered, onHashChange, onNavItemClick, className, declarative } =
+      this.props;
+    const { currentListNo, navStructure } = this.state;
     const tBlocks = navStructure.map((t) => {
-      const cls = `title-anchor title-level${t.level} ${
-        this.state.currentListNo === t.listNo ? "active" : ""
-      }`;
+      const cls = `${styles["title-anchor"]} ${
+        styles[`title-level${t.level}`]
+      }  ${this.state.currentListNo === t.listNo ? styles.active : ""}`;
 
       return (
         <div
           className={cls}
           onClick={(evt) => {
-            const currentHash = this.props.declarative
+            const currentHash = declarative
               ? `${t.listNo}-${t.text}` // 加入listNo确保hash唯一ZZ
               : `heading-${t.index}`;
 
             // Avoid execution the callback `onHashChange` when clicking current nav item
             if (t.listNo !== currentListNo) {
               // Hash changing callback
-             onHashChange(currentHash, this.getCurrentHashValue());
+              onHashChange(currentHash, this.getCurrentHashValue());
             }
 
             // Nav item clicking callback
-          onNavItemClick(evt, evt.target, currentHash);
+            onNavItemClick(evt, evt.target, currentHash);
 
-            // this.updateHash(currentHash);
+            if (this.props.hashMode) {
+              this.updateHash(currentHash);
+            }
             this.scrollToTarget(currentHash);
             this.setState({
               currentListNo: t.listNo,
@@ -406,11 +400,7 @@ export class MarkdownNavbar extends Component {
       );
     });
 
-    return (
-      <div className={`markdown-navigation ${className}`}>
-        {tBlocks}
-      </div>
-    );
+    return <div className={`markdown-navigation ${className}`}>{tBlocks}</div>;
   }
 }
 

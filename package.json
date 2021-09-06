@@ -1,6 +1,21 @@
 {
   "name": "react-markdown-navbar",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:Xianbei233/react-markdown-navbar.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -15,5 +30,15 @@
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.24.0",
     "vite": "^2.4.4"
-  }
+  },
+  "keywords": [
+    "markdown",
+    "navigation",
+    "navigator",
+    "navbar",
+    "menu",
+    "react"
+  ],
+  "author": "xianbei233",
+  "license": "MIT"
 }
