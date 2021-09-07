@@ -215,7 +215,7 @@ export class MarkdownNavbar extends Component {
 
     const { scrollConfig } = this.props;
 
-    element.scrollTo({ top, left, ...scrollConfig });
+    element.scrollTo({ ...scrollConfig, top, left });
   }
 
   refreshNav(source) {
@@ -315,10 +315,17 @@ export class MarkdownNavbar extends Component {
 
   winScroll = throttle(() => {
     if (this.scrollEventLock) return;
-
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      this.props.container.scrollTop ||
+      0;
     const newHeadingList = this.getHeadingList().map((h) => ({
       ...h,
-      distanceToTop: Math.abs(this.props.headingTopOffset - h.offsetTop),
+      distanceToTop: Math.abs(
+        scrollTop + this.props.headingTopOffset - h.offsetTop
+      ),
     }));
     const minDistance = Math.min(...newHeadingList.map((h) => h.distanceToTop));
     const curHeading = newHeadingList.find(
@@ -400,7 +407,11 @@ export class MarkdownNavbar extends Component {
       );
     });
 
-    return <div className={`markdown-navigation ${className}`}>{tBlocks}</div>;
+    return (
+      <div className={`${styles["markdown-navigation"]} ${className}`}>
+        {tBlocks}
+      </div>
+    );
   }
 }
 
