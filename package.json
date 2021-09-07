@@ -1,6 +1,6 @@
 {
   "name": "react-markdown-navbar",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "files": [
     "dist"
   ],
@@ -11,7 +11,7 @@
       "import": "./dist/index.es.js",
       "require": "./dist/index.umd.js"
     },
-    "./": "./"
+    "./dist/": "./dist/"
   },
   "repository": {
     "type": "git",
