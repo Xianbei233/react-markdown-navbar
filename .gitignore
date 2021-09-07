@@ -4,4 +4,5 @@ dist
 dist-ssr
 *.local
 *.lock
+*.log
 package-lock.json

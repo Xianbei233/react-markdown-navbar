@@ -1,6 +1,6 @@
 {
   "name": "react-markdown-navbar",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "files": [
     "dist"
   ],
@@ -13,11 +13,14 @@
     },
     "./dist/": "./dist/"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:Xianbei233/react-markdown-navbar.git"
+    "url": "https://github.com/Xianbei233/react-markdown-navbar"
   },
   "scripts": {
+    "prepublish": "vite build",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
