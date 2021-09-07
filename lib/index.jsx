@@ -48,11 +48,7 @@ export class MarkdownNavbar extends Component {
     declarative: PropTypes.bool,
     className: PropTypes.string,
     container: PropTypes.node,
-    scrollConfig: PropTypes.shape({
-      top: PropTypes.number,
-      left: PropTypes.number,
-      behavior: PropTypes.string,
-    }),
+    behavior: PropTypes.string,
     onNavItemClick: PropTypes.func,
     onHashChange: PropTypes.func,
   };
@@ -66,11 +62,7 @@ export class MarkdownNavbar extends Component {
     declarative: false,
     className: "",
     container: window,
-    scrollConfig: {
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    },
+    behavior: "auto",
     onNavItemClick: () => {},
     onHashChange: () => {},
   };
@@ -213,9 +205,9 @@ export class MarkdownNavbar extends Component {
   safeScrollTo(element, top, left = 0) {
     // element only supports dom of ref instance(ref.current or callback ref)
 
-    const { scrollConfig } = this.props;
+    const { behavior } = this.props;
 
-    element.scrollTo({ ...scrollConfig, top, left });
+    element.scrollTo({ behavior, top, left });
   }
 
   refreshNav(source) {
