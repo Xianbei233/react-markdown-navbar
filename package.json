@@ -16,7 +16,7 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "repository": "git@github.com:Xianbei233/react-markdown-navbar.git",
+  "repository": "git://github.com/Xianbei233/react-markdown-navbar.git",
   "scripts": {
     "prepublish": "vite build",
     "dev": "vite",
