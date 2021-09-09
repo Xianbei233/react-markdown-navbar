@@ -38,7 +38,7 @@ function throttle(fn, wait) {
   return throttled;
 }
 
-export class MarkdownNavbar extends Component {
+class MarkdownNavbar extends Component {
   static propTypes = {
     source: PropTypes.string.isRequired,
     ordered: PropTypes.bool,
