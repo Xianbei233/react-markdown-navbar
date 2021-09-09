@@ -1,23 +1,29 @@
-name: Node.js Package
+name: Package Publish
 
 on:
   release:
     types: [created]
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v2
         with:
-          node-version: 12
-      - run: npm ci
-      - run: npm test
+          node-version: "12.x"
+          registry-url: "https://registry.npmjs.org"
+          # Defaults to the user or organization that owns the workflow file
+          scope: "@xianbei233"
+      - run: yarn
+      - run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+  # publish-gpr:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     packages: write
+  #     contents: read
