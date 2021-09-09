@@ -16,8 +16,11 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           # Defaults to the user or organization that owns the workflow file
           scope: "@xianbei233"
-      - run: yarn
-      - run: yarn publish
+      - name: dependencies install
+        run: yarn
+      - name: build and publish
+        run: npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
